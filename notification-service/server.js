@@ -20,6 +20,6 @@ wss.on("connection", () => {
     console.log("User connected to Notification WebSocket");
 });
 
-server.listen(3003, () => {
+server.listen(3004, () => {
     console.log("Notification Service running on http://localhost:3003");
 });
