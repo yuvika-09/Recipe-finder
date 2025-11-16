@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Update Recipe - Recipe Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+      background: url('https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 15px;
+      width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    h1 { color: #333; margin-bottom: 20px; }
+    input {
+      width: 95%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #ff6b6b;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: #ff4757; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Update Recipe</h1>
+    <input id="name" placeholder="Recipe Name"><br>
+    <input id="ingredients" placeholder="Ingredients"><br>
+    <input id="instructions" placeholder="Instructions"><br>
+    <input id="image" placeholder="Image URL"><br>
+    <button onclick="updateRecipe()">Save</button>
+    <button onclick="goBack()">Cancel</button>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const id = localStorage.getItem('updateId');
+    if(!token) window.location.href = '/login.html';
+
+    // Fetch existing recipe data
+    fetch('/api/recipes', { headers: { 'Authorization': token } })
+      .then(res => res.json())
+      .then(data => {
+        const recipe = data.find(r => r._id === id);
+        if(recipe){
+          document.getElementById('name').value = recipe.name;
+          document.getElementById('ingredients').value = recipe.ingredients;
+          document.getElementById('instructions').value = recipe.instructions;
+          document.getElementById('image').value = recipe.image || '';
+        }
+      });
+
+    function updateRecipe(){
+      const name = document.getElementById('name').value;
+      const ingredients = document.getElementById('ingredients').value;
+      const instructions = document.getElementById('instructions').value;
+      const image = document.getElementById('image').value;
+
+      fetch(`/api/recipes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': token },
+        body: JSON.stringify({ name, ingredients, instructions, image })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        localStorage.removeItem('updateId');
+        window.location.href = '/dashboard.html';
+      });
+    }
+
+    function goBack(){
+      localStorage.removeItem('updateId');
+      window.location.href = '/dashboard.html';
+    }
+  </script>
+</body>
+</html>
