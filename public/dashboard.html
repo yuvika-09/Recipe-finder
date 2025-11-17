@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - Recipe Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      padding-top: 70px;
+    }
+
+    /* Navbar styling */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255,255,255,0.95);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    .navbar h1 { margin: 0; font-size: 24px; }
+    .navbar button {
+      padding: 8px 15px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #ff6b6b;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .navbar button:hover { background: #ff4757; }
+    .navbar input {
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 180px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 15px;
+      width: 600px;
+      margin: auto;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    #addForm { display: none; margin-top: 20px; }
+    #addForm input {
+      width: 95%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    #addForm button { padding: 12px 25px; margin-top: 10px; }
+
+    #recipesList div {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; 
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 5px;
+  background: #fdfdfd;
+}
+
+#recipesList .details {
+  display: flex;
+  flex-direction: column;   
+  max-width: 70%;           
+  text-align: left;
+}
+
+#recipesList img {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-left: 15px;
+}
+
+#recipesList .buttons {
+  margin-top: 10px;
+}
+
+#recipesList .buttons button {
+  padding: 6px 12px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 5px;
+  background: #ff6b6b;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#recipesList .buttons button:hover {
+  background: #ff4757;
+}
+
+    </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>Recipe Finder</h1>
+    <div>
+      <input type="text" id="searchInput" placeholder="Search by ingredient" onkeyup="searchRecipes()">
+      <button onclick="showAddForm()">Add Recipe</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="addForm">
+      <input id="name" placeholder="Recipe Name"><br>
+      <input id="ingredients" placeholder="Ingredients"><br>
+      <input id="instructions" placeholder="Instructions"><br>
+      <input id="image" placeholder="Image URL"><br>
+      <button onclick="addRecipe()">Add</button>
+      <button onclick="hideAddForm()">Cancel</button>
+    </div>
+
+    <h2>My Recipes</h2>
+    <div id="recipesList"></div>
+  </div>
+
+  <script src="/script.js"></script>
+  <script>
+    // WebSocket listener: refresh list on any recipe-event
+    const ws = new WebSocket("ws://localhost:9000");
+    ws.onmessage = (ev) => {
+      try {
+        const data = JSON.parse(ev.data);
+        // simple strategy: re-fetch on any event
+        getRecipes();
+      } catch(e){}
+    };
+  </script>
+</body>
+</html>
