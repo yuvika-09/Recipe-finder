@@ -100,7 +100,6 @@ app.delete("/api/recipes/:id", (req, res) => {
     .catch(e => res.status(500).json({ error: e.message }));
 });
 
-
 app.use("/", express.static(path.join(__dirname, "..", "public")));
 
 app.listen(5000, () => console.log("API Gateway running on http://localhost:5000"));
