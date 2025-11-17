@@ -14,7 +14,6 @@ wss.on("connection", (ws) => {
 
 (async () => {
     await subscriber.subscribe("recipe-events", (message) => {
-        // broadcast to connected websockets
         for (let ws of Array.from(clients)) {
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(message);
