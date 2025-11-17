@@ -1,4 +1,3 @@
-// recipe-service/server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -8,21 +7,20 @@ const redis = require("redis");
 const app = express();
 app.use(express.json());
 
-// Allow cross-origin requests if your gateway or frontend is on a different origin
+
 const cors = require("cors");
 app.use(cors());
 
-// Config
+
 const MONGO = process.env.MONGO || "mongodb://127.0.0.1:27017/recipeDB";
 const JWT_SECRET = process.env.JWT_SECRET || "SECRET123";
 const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 
-// Connect MongoDB
 mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Recipe DB connected"))
   .catch(err => console.error("Mongo connect error:", err.message));
 
-// Setup Redis publisher but keep it optional (fail-safe)
+
 let publisher = null;
 (async () => {
   try {
@@ -36,7 +34,7 @@ let publisher = null;
   }
 })();
 
-// Safe publish helper
+
 async function safePublish(channel, payload) {
   if (!publisher || !publisher.isOpen) return;
   try {
@@ -46,7 +44,7 @@ async function safePublish(channel, payload) {
   }
 }
 
-// Middleware: verify token (accepts "Bearer <token>" or raw token)
+
 function verify(req, res, next) {
   try {
     const auth = req.headers.authorization || req.headers.Authorization || "";
@@ -62,8 +60,7 @@ function verify(req, res, next) {
 
 // ---------- ROUTES ----------
 
-// GET /recipes
-// Public: supports optional search ?q=term
+
 app.get("/recipes/search", verify, async (req, res) => {
     const query = req.query.q || "";
 
@@ -86,7 +83,7 @@ app.get("/recipes", verify, async (req, res) => {
     res.json(list);
 });
 
-// GET single recipe
+
 app.get("/recipes/:id", async (req, res) => {
   try {
     const r = await Recipe.findById(req.params.id).lean();
@@ -98,10 +95,9 @@ app.get("/recipes/:id", async (req, res) => {
   }
 });
 
-// POST create recipe (protected)
+
 app.post("/recipes", verify, async (req, res) => {
   try {
-    // Basic validation
     if (!req.body.name || !String(req.body.name).trim()) {
       return res.status(400).json({ message: "Recipe name is required" });
     }
@@ -120,7 +116,7 @@ app.post("/recipes", verify, async (req, res) => {
   }
 });
 
-// PUT update recipe (protected)
+
 app.put("/recipes/:id", verify, async (req, res) => {
   try {
     const updates = {};
@@ -140,7 +136,7 @@ app.put("/recipes/:id", verify, async (req, res) => {
   }
 });
 
-// DELETE recipe (protected)
+
 app.delete("/recipes/:id", verify, async (req, res) => {
   try {
     const deleted = await Recipe.findByIdAndDelete(req.params.id);
@@ -153,8 +149,7 @@ app.delete("/recipes/:id", verify, async (req, res) => {
   }
 });
 
-// Health
-app.get("/healthz", (req, res) => res.json({ ok: true }));
+
 
 const PORT = process.env.PORT || 7000;
 app.listen(PORT, () => console.log(`Recipe service running on http://localhost:${PORT}`));
