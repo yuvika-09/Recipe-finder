@@ -116,8 +116,7 @@ function getRecipes(){
     .then(userRecipes => {
       let allRecipes = [...defaultRecipes, ...userRecipes];
 
-      // Sort user recipes newest first
-      allRecipes.sort((a, b) => (b._id || "").localeCompare(a._id || ""));
+      allRecipes.sort((b, a) => (b._id || "").localeCompare(a._id || ""));
 
       recipesData = allRecipes;
       displayRecipes(allRecipes);
