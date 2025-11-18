@@ -60,6 +60,7 @@ function verify(req, res, next) {
 
 // ---------- ROUTES ----------
 
+
 app.get("/recipes/search", verify, async (req, res) => {
     const query = req.query.q || "";
 
