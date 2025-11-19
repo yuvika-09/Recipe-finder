@@ -12,9 +12,9 @@ const cors = require("cors");
 app.use(cors());
 
 
-const MONGO = process.env.MONGO || "mongodb://127.0.0.1:27017/recipeDB";
-const JWT_SECRET = process.env.JWT_SECRET || "SECRET123";
-const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+const MONGO = "mongodb://127.0.0.1:27017/recipeDB";
+const JWT_SECRET = "SECRET123";
+const REDIS_URL = "redis://127.0.0.1:6379";
 
 mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Recipe DB connected"))
@@ -127,12 +127,12 @@ app.put("/recipes/:id", verify, async (req, res) => {
     updates.updatedAt = new Date();
 
     const recipe = await Recipe.findByIdAndUpdate(req.params.id, updates, { new: true });
-    if (!recipe) return res.status(404).json({ message: "Not found" });
+    if (!recipe) return res.json({ message: "Not found" });
     await safePublish("recipe-events", { type: "UPDATE", recipe });
     res.json({ message: "Recipe updated", recipe });
   } catch (e) {
     console.error("PUT /recipes/:id error:", e);
-    res.status(500).json({ message: "Server error", error: e.message });
+    res.json({ message: "Server error", error: e.message });
   }
 });
 
