@@ -61,7 +61,7 @@ app.get("/recipes", verify, async (req, res) => {
   res.json(list);
 });
 
-// Get by ID
+
 app.get("/recipes/:id", async (req, res) => {
   const recipe = await Recipe.findById(req.params.id);
   if (!recipe) 
